@@ -70,6 +70,28 @@ def statistics(data):
     print("\nsp_prog:\n", data['sp_prog'].value_counts())
     print("\napproved:\n", data['approved'].value_counts())
     
+def predict_approval(price, year, age, income, m_s, sp_prog):
+    model = LogisticRegression(random_state=42)
+
+    data = pd.read_excel("data.xlsx")
+
+    X = data.drop('approved', axis=1)
+    y = data['approved']
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    model.fit(X_scaled, y)
+
+    input_data = [[price, year, age, income, m_s, sp_prog]]
+    input_scaled = scaler.transform(input_data)
+
+    approval_prediction = model.predict(input_scaled)[0]
+
+    if approval_prediction == 1:
+        return "Approved"
+    else:
+        return "Not Approved"
 def plot_learning_curve(data):
     X = data.drop('approved', axis=1)
     y = data['approved']
@@ -96,6 +118,8 @@ def plot_learning_curve(data):
     plt.ylabel('Score')
     plt.legend()
     plt.show()
+    
+#def model()
 
 
 data = pd.read_excel("data.xlsx")
@@ -105,3 +129,13 @@ drawing(data)
 plot_learning_curve(data)
 statistics(data)
 logistic(data)
+
+price_input = float(input("Enter price: "))
+year_input = int(input("Enter year: "))
+age_input = int(input("Enter age: "))
+income_input = int(input("Enter income: "))
+m_s_input = int(input("Enter m_s (0 or 1): "))
+sp_prog_input = int(input("Enter sp_prog (0 or 1): "))
+
+result = predict_approval(price_input, year_input, age_input, income_input, m_s_input, sp_prog_input)
+print(f"The prediction is: {result}")
